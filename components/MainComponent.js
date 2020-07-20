@@ -3,11 +3,14 @@ import Menu from './MenuComponent';
 import Home from './HomeComponent';
 // import { DISHES } from '../shared/dishes';
 import DishDetail from './DishDetailComponent';
+import contact from './ContactComponent';
+import Aboutus from './AboutComponent';
 import { View , Platform} from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import ExpoStatusBar from 'expo-status-bar/build/ExpoStatusBar';
 import { NavigationContainer } from '@react-navigation/native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
+import { createNativeWrapper } from 'react-native-gesture-handler';
 // const MenuNavigator = createStackNavigator({
 //     Menu: { screen: Menu },
 //     Dishdetail: { screen: DishDetail }
@@ -78,6 +81,45 @@ function HomeNavigatorScreen(){
 }
 
 
+const aboutNavigator = createStackNavigator();
+
+function aboutNavigatorScreen() {
+    return(
+        <aboutNavigator.Navigator screenOptions={{
+            headerStyle:{
+                backgroundColor: '#512DA8'
+            },
+            headerTintColor:'#fff',
+            headerTitleStyle:{
+                color:'#fff'
+            }
+        }} >
+            <aboutNavigator.Screen name='About Us' component={Aboutus}/>
+        </aboutNavigator.Navigator>
+    );
+    
+}
+
+
+const contactNavigator = createStackNavigator();
+
+function contactNavigatorScreen() {
+    return(
+        <contactNavigator.Navigator screenOptions={{
+            headerStyle:{
+                backgroundColor:'#512DA8'
+            },
+            headerTintColor: '#fff',
+            headerTitleStyle: {
+                color:'#fff'
+            }
+        }}>
+            <contactNavigator.Screen  name='Contact Us' component={contact}  />
+        </contactNavigator.Navigator>
+    );
+    
+}
+
 // const MainNavigator = createDrawerNavigator({
 //     Home: {
 //         screen: HomeNavigator,
@@ -105,12 +147,15 @@ const MainNavigator = createDrawerNavigator();
 
 function MainNavigatorScreen(){
     return(
-        <MainNavigator.Navigator initialRouteName='Home' screenOptions={{
-            
-            drawerBackgroundColor: '#D1C4E9'
-        }}>
+        <MainNavigator.Navigator initialRouteName='Home'
+        drawerStyle={{backgroundColor:'#D1C4E9'}}
+        >
             <MainNavigator.Screen name="Home" component={HomeNavigatorScreen}/>
+            <HomeNavigator.Screen name="About Us" component={aboutNavigatorScreen}/>
+            
             <HomeNavigator.Screen name="Menu" component={MenuNavigatorScreen}/>
+            
+            <HomeNavigator.Screen name="Contact Us" component={contactNavigatorScreen}/>
 
         </MainNavigator.Navigator>
     );
