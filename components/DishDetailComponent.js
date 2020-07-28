@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, ScrollView, PanResponder, Alert, FlatList, Modal, StyleSheet, Button } from 'react-native';
+import { View, Text, ScrollView, PanResponder, Share, Alert, FlatList, Modal, StyleSheet, Button } from 'react-native';
 import { Card, Icon, Input, Rating } from 'react-native-elements';
 // import { DISHES } from '../shared/dishes';
 // import { COMMENTS } from '../shared/comments';
@@ -40,6 +40,16 @@ function RenderDish(props){
 
     };
 
+    const recognizeComment=({moveX,moveY,dx,dy})=>{
+        if(dx>200)
+        {
+            return true;
+        }
+        else{
+            return false;
+        }
+    };
+
     const panResponder=PanResponder.create({
         onStartShouldSetPanResponder: (e, gestureState)=>{
             return true;
@@ -50,7 +60,7 @@ function RenderDish(props){
 
         },
         onPanResponderEnd: (e, gestureState)=>{
-            if(recognizeDrag(gestureState))
+            if(recognizeDrag(gestureState)){
             Alert.alert(
                 'Add to Favorite',
                 'Are you sure you wish to add '+ dish.name + ' to favorite?',
@@ -70,8 +80,27 @@ function RenderDish(props){
             )
             
             return true;
+            }
+
+            if(recognizeComment(gestureState))
+            {
+            props.toggleModal()
+            return true;
+            }
         }
     });
+
+
+    const shareDish = (title, message, url) => {
+        Share.share({
+            title: title,
+            message: title + ': ' + message + ' ' + url,
+            url: url
+        },{
+            dialogTitle: 'Share ' + title
+        })
+    }
+
 
     if(dish != null){
         return(
@@ -88,6 +117,15 @@ function RenderDish(props){
             <View style={{flexDirection:'row',justifyContent:'center'}}>
             <Icon raised reverse name={props.favorite?'heart':'heart-o'} type='font-awesome' color='#f50' onPress={()=>props.favorite?console.log('Already favorite'):props.onPress()}/>
             <Icon raised reverse name='pencil' type='font-awesome' color='#512DA9' onPress={()=>props.toggleModal()}/>
+            <Icon
+                    raised
+                    reverse
+                    name='share'
+                    type='font-awesome'
+                    color='#51D2A8'
+                    style={styles.cardItem}
+                    onPress={() => shareDish(dish.name, dish.description, baseUrl + dish.image)} />
+                    
             </View>
             </Card>
         </Animatable.View>

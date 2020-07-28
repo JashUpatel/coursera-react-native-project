@@ -9,10 +9,16 @@ import {
   Button,
   TouchableOpacity,
   Modal,
+  Animated,
+  Alert,
 } from "react-native";
 import { Card,Icon } from "react-native-elements";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import Moment from 'moment';
+import * as Animatable from 'react-native-animatable';
+import { Notifications } from 'expo';
+import * as Permissions from 'expo-permissions';
+import * as Calendar from 'expo-calendar';
 
 class Reservation extends Component {
   constructor(props) {
@@ -35,7 +41,30 @@ class Reservation extends Component {
 
   handleReservation() {
     console.log(JSON.stringify(this.state));
-    this.toggleModal();
+    // this.toggleModal();
+    Alert.alert('Your Reservation OK?'
+    ,'Number of Guests: '+this.state.guests+'\n Smoking? '+ this.state.smoking+ '\n Date and Time: '+this.state.date,
+    [
+      {
+        text:'Cancel',
+        onPress:()=>this.resetForm(),
+        style:'cancel'
+      },
+      {
+        text:'OK',
+        onPress:()=>{
+          this.presentLocalNotification(this.state.date)
+          this.addReservationToCalendar(this.state.date);
+          this.resetForm()
+
+
+
+        }
+      }
+    ],
+    {cancelable:false}
+    )
+
   }
 
   resetForm() {
@@ -50,12 +79,85 @@ class Reservation extends Component {
     });
   }
 
+  async obtainNotificationPermission() {
+    let permission = await Permissions.getAsync(Permissions.USER_FACING_NOTIFICATIONS);
+    if (permission.status !== 'granted') {
+        permission = await Permissions.askAsync(Permissions.USER_FACING_NOTIFICATIONS);
+        if (permission.status !== 'granted') {
+            Alert.alert('Permission not granted to show notifications');
+        }
+    }
+    return permission;
+  }
+
+  async presentLocalNotification(date) {
+    await this.obtainNotificationPermission();
+    Notifications.presentLocalNotificationAsync({
+        title: 'Your Reservation',
+        body: 'Reservation for '+ date + ' requested',
+        ios: {
+            sound: true
+        },
+        android: {
+            sound: true,
+            vibrate: true,
+            color: '#512DA8'
+        }
+    });
+  }
+
+
+  async obtainCalendarPermission(){
+    let calendarPermission = await Permissions.getAsync(Permissions.CALENDAR);
+    if(calendarPermission.status != 'granted'){
+     calendarPermission = await Permissions.askAsync(Permissions.CALENDAR);
+     if(calendarPermission.status != 'granted'){
+        Alert.alert('Permission not granted to add calendar event!')
+    }
+
+  }
+  return calendarPermission
+}
+
+async  getDefaultCalendarSource() {
+  const calendars = await Calendar.getCalendarsAsync();
+  const defaultCalendars = calendars.filter(each => each.source.name === 'Default');
+  return defaultCalendars[0].source;
+}
+
+async addReservationToCalendar(date){
+  await this.obtainCalendarPermission();
+  const defaultCalendarSource =
+    Platform.OS === 'ios'
+      ? await getDefaultCalendarSource()
+      : { isLocalAccount: true, name: 'Expo Calendar' };
+  const newCalendarID = await Calendar.createCalendarAsync({
+        title: 'Con Fusion Table Reservation',
+        color: 'blue',
+        entityType: Calendar.EntityTypes.EVENT,
+        sourceId: defaultCalendarSource.id,
+        source: defaultCalendarSource,
+        name: 'internalCalendarName',
+        ownerAccount: 'personal',
+        accessLevel: Calendar.CalendarAccessLevel.OWNER,
+      });
+  Calendar.createEventAsync(newCalendarID,{
+    title:'Con Fusion Table Reservation',
+    startDate:new Date(Date.parse(date)),
+    endDate: new Date(Date.parse(date)+ 2*60*60*1000),
+    timeZone:'Asia/Hong_Kong',
+    location:'121, Clear Water Bay Road, Clear Water Bay, Kowloon, Hong Kong'
+  })
+
+}
+
   render() {
     const showDatepicker = () => {
       this.setState({ show: true });
     };
     return (
       <ScrollView>
+        <Animatable.View animation='zoomIn' duration={2000}>
         <View style={styles.formRow}>
           <Text style={styles.formLabel}>Number of Guests</Text>
           <Picker
@@ -132,6 +234,8 @@ class Reservation extends Component {
             accessibilityLabel="Learn more about this purple button"
           />
         </View>
+        </Animatable.View>
+
         <Modal
           animationType={"slide"}
           transparent={false}
