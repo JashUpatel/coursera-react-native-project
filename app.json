@@ -3,6 +3,13 @@
   "displayName": "confusion",
   "expo": {
     "name": "confusion",
+    "icon":"./icon.png",
+    "ios": {
+      "bundleIdentifier": "net.food.confusion.confusion"
+    },
+    "android": {
+      "package": "net.food.confusion.confusion"
+    },
     "slug": "confusion",
     "version": "1.0.0",
     "assetBundlePatterns": [

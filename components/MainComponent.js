@@ -82,7 +82,7 @@ const CustomDrawerContentComponent = (props) => (
         <View style={styles.drawerHeader}>
             <View style={{flex: 1}}>
                 <Image 
-                    source={{uri:'http://localhost:3001/images/logo.png'}}
+                    source={{uri: baseUrl + 'images/logo.png'}}
                     style={styles.drawerImage}
                 />
             </View>

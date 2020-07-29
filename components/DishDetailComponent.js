@@ -202,6 +202,7 @@ class DishDetail extends Component{
         console.log(JSON.stringify(this.state));
         this.props.postComment(dishId,rating,author,comment)
         this.resetForm();
+        this.toggleModal();
         
     }
 
@@ -277,7 +278,7 @@ class DishDetail extends Component{
                     <Button title='Submit' color='#512DA8' style={{paddingVertical:25,}} onPress={()=>this.onSubmit(dishId)} />
                     </View>
                     <View style={{marginTop:10,  }}>
-                    <Button title='Cancel' color='#DDDDDD' style={{paddingVertical:25,}} onPress={()=>this.toggleModal} />
+                    <Button title='Cancel' color='#DDDDDD' style={{paddingVertical:25,}} onPress={()=>this.toggleModal()} />
                     </View>
                 </View>
 
